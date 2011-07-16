@@ -18,7 +18,7 @@ module AbstractSystemHandler
   def receive_json(json)
     # обработка полученного json-а
     answer = JSON.dump({:id => json['id'], :text => "answ#{json['id']}"})
-    $log.debug("AbstractSystemHandler #{self.hash}") {'Отправил #{answer}.'}
+    $log.debug("AbstractSystemHandler #{self.hash}") {"Отправил #{answer}."}
     send_data "#{answer}\n"
   end
 
@@ -26,7 +26,7 @@ module AbstractSystemHandler
     delay_sec = Random.rand(3)
     $log.debug("AbstractSystemHandler #{self.hash}") { "Принял #{line}." }
     $log.debug("AbstractSystemHandler #{self.hash}") { "Пауза #{delay_sec} секунд." }
-    EM.add_timer(delay_sec) do # задержка на пару секунд. Это абстрактная система очень медленнная...
+    add_timer(delay_sec) do # задержка на пару секунд. Это абстрактная система очень медленнная...
       begin
         json = JSON.load(line)
         raise unless REQUIRED_KEYS.all? { |i| json.has_key? i }
@@ -40,18 +40,29 @@ module AbstractSystemHandler
       end
     end
   end
+
+  private
+
+  def add_timer(delay, &block)
+    EM.add_timer(delay) do
+      block.call
+    end
+  end
 end
 
-trap('SIGINT') { # правильно выходим по ctrl-c
-  puts 'Принудительное завершение!'
-  EM.stop_event_loop
-  exit(0)
-}
+if __FILE__==$0
+  trap('SIGINT') { # правильно выходим по ctrl-c
+    puts 'Принудительное завершение!'
+    EM.stop_event_loop
+    exit(0)
+  }
 
-EM.run {
-  ip, port = '127.0.0.1', '9001'
-  puts "Запуск сервера абстрактной системы #{ip}:#{port}."
-  EM::start_server ip, port, AbstractSystemHandler
-}
+  EM.run {
+    ip, port = '127.0.0.1', '9001'
+    puts "Запуск сервера абстрактной системы #{ip}:#{port}."
+    EM::start_server ip, port, AbstractSystemHandler
+  }
 
-puts 'Остановка сервера абстрактной системы.'
+  puts 'Остановка сервера абстрактной системы.'
+
+end

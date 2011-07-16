@@ -1,1 +1,5 @@
-gem "eventmachine", :git => "git://github.com/eventmachine/eventmachine.git", :tag => "v0.12.10"
+source "http://rubygems.org"
+
+gem "rspec"
+gem "eventmachine"
+gem "rr"
