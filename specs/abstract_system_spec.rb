@@ -3,7 +3,7 @@
 require "rspec"
 require "rr"
 
-require "./abstract_system.rb"
+require "../abstract_system.rb"
 
 
 $log = Logger.new(nil) # подавить вывод логов в консоль
